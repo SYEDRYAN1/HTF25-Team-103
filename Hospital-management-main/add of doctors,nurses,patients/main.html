@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nurse Interface</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="topbar">
+    <button class="menu-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="tabs">
+      <div class="tab active">Doctor</div>
+      <div class="tab">Nurse</div>
+      <div class="tab">Analytic</div>
+      <div class="tab">Analytic</div>
+      <div class="tab">Analytic</div>
+    </div>
+    <div class="right-controls">
+      <button class="add-button" id="addBtn" title="Add new">+</button>
+    </div>
+    <div class="add-menu" id="addMenu">
+      <div class="add-menu-item" data-type="doctor">+ Add Doctor</div>
+      <div class="add-menu-item" data-type="nurse">+ Add Nurse</div>
+      <div class="add-menu-item" data-type="patient">+ Add Patient</div>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <div class="sidebar">
+      <div class="search-box">
+        <input type="text" id="doctorSearch" placeholder="Search doctors...">
+      </div>
+      <div class="doctor-list" id="doctorSidebar">
+        <!-- Doctor items injected by JS -->
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="content-wrapper">
+        <div class="content-header">
+          <div class="doctor-title" id="doctorTitle">Select a doctor</div>
+          <div class="timing" id="timing">-</div>
+        </div>
+
+        <div class="patient-section">
+          <div class="patient-header">
+            <div class="patient-title">Patient</div>
+            <a href="Details.html" class="details-button">More Details Patient</a>
+          </div>
+          <div class="patient-info" id="patientInfo">
+            <div class="patient-info-content">
+              <em>Select a doctor to view patient information</em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

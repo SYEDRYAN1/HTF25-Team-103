@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nurse Interface</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f6f8fa;
+      color: #222;
+      font-size: 1.1em;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* ---- Topbar ---- */
+    .topbar {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      padding: 0 24px;
+      height: 56px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .menu-icon {
+      font-size: 1.7em;
+      margin-right: 18px;
+      cursor: pointer;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 32px;
+      flex: 1;
+    }
+
+    .tab {
+      padding: 8px 18px;
+      font-size: 1.1em;
+      cursor: pointer;
+      border-radius: 8px 8px 0 0;
+      background: #f6f8fa;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+
+    .tab:hover {
+      background: #e3f2fd;
+    }
+
+    .tab.active {
+      background: #e3f2fd;
+      font-weight: bold;
+      border-bottom: 2px solid #1976d2;
+    }
+
+    /* ---- Main Container ---- */
+    .main-container {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ---- Sidebar ---- */
+    .sidebar {
+      width: 260px;
+      background: #fff;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      border-right: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .search-box {
+      padding: 12px 16px;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      flex-shrink: 0;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1em;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-box input:focus {
+      border-color: #1976d2;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.15);
+    }
+
+    .nurse-item {
+      padding: 12px 18px;
+      cursor: pointer;
+      border-radius: 8px;
+      margin: 0 8px;
+      font-size: 1.05em;
+      transition: background 0.2s;
+    }
+
+    .nurse-item:hover,
+    .nurse-item.selected {
+      background: #e3f2fd;
+      font-weight: bold;
+    }
+
+    /* ---- Content Area ---- */
+    .content {
+      flex: 1;
+      padding: 32px 40px;
+      background: #f6f8fa;
+      overflow-y: auto;
+    }
+
+    .nurse-title {
+      font-size: 2em;
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #1976d2;
+    }
+
+    .nurse-shift {
+      font-size: 1.1em;
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 8px 18px;
+      background: #1976d2;
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 1em;
+      transition: background 0.2s;
+    }
+
+    .back-button:hover {
+      background: #1565c0;
+    }
+
+    /* ---- Calendar Styles ---- */
+    .calendar-container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 24px;
+      margin-top: 16px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e3f2fd;
+    }
+
+    .month-title {
+      font-size: 1.5em;
+      font-weight: 600;
+      color: #1976d2;
+    }
+
+    .month-nav {
+      display: flex;
+      gap: 12px;
+    }
+
+    .month-nav button {
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.2s;
+    }
+
+    .month-nav button:hover {
+      background: #1565c0;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .calendar-day-header {
+      text-align: center;
+      font-weight: 600;
+      padding: 12px;
+      background: #e3f2fd;
+      border-radius: 8px;
+      color: #1976d2;
+      font-size: 0.95em;
+    }
+
+    .calendar-day {
+      background: #f6f8fa;
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 80px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+    }
+
+    .calendar-day:hover {
+      background: #e3f2fd;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .calendar-day.has-shift {
+      background: #fff;
+      border: 2px solid #1976d2;
+    }
+
+    .calendar-day.has-shift:hover {
+      background: #e3f2fd;
+    }
+
+    .day-number {
+      font-weight: 600;
+      font-size: 1.1em;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .day-hours {
+      font-size: 0.9em;
+      color: #1976d2;
+      font-weight: 500;
+    }
+
+    .day-shift-type {
+      font-size: 0.85em;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .calendar-day.empty {
+      background: transparent;
+      cursor: default;
+    }
+
+    .calendar-day.empty:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .summary-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border-left: 4px solid #1976d2;
+    }
+
+    .summary-card.overtime {
+      border-left-color: #f57c00;
+    }
+
+    .summary-card.breaks {
+      border-left-color: #388e3c;
+    }
+
+    .summary-card.total {
+      border-left-color: #7b1fa2;
+    }
+
+    .summary-label {
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .summary-value {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #1976d2;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="menu-icon">☰</div>
+    <div class="tabs">
+      <div class="tab">Doctor</div>
+      <div class="tab active">Nurse</div>
+      <div class="tab">Analytic</div>
+      <div class="tab">Analytic</div>
+      <div class="tab">Analytic</div>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <!-- Sidebar with Nurse List -->
+    <div class="sidebar">
+      <div class="search-box">
+        <input type="text" id="nurseSearch" placeholder="Search nurse..." />
+      </div>
+      <div id="nurseSidebar"></div>
+    </div>
+
+    <!-- Content Area with Calendar -->
+    <div class="content">
+      <a href="main.html" class="back-button">← Back to Overview</a>
+      
+      <div class="nurse-title" id="nurseTitle">Select a Nurse</div>
+      <div class="nurse-shift" id="nurseShift"></div>
+      
+      <!-- Calendar Container -->
+      <div class="calendar-container">
+        <div class="calendar-header">
+          <div class="month-title" id="monthTitle">October 2025</div>
+          <div class="month-nav">
+            <button id="prevMonth">← Prev</button>
+            <button id="nextMonth">Next →</button>
+          </div>
+        </div>
+
+        <div class="calendar-grid" id="calendarGrid">
+          <!-- Calendar will be generated here -->
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="summary-label">Total Hours This Month</div>
+          <div class="summary-value" id="totalHours">160h</div>
+        </div>
+        <div class="summary-card overtime">
+          <div class="summary-label">Overtime Hours</div>
+          <div class="summary-value" id="overtimeHours">12h</div>
+        </div>
+        <div class="summary-card breaks">
+          <div class="summary-label">Break Hours</div>
+          <div class="summary-value" id="breakHours">20h</div>
+        </div>
+        <div class="summary-card total">
+          <div class="summary-label">Days Worked</div>
+          <div class="summary-value" id="daysWorked">20</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Nurse data - can be loaded from CSV
+    const nurses = [
+      { name: "Nurse Alice", shift: "Morning Shift (6 AM - 2 PM)", hours: 8, shiftType: "Morning" },
+      { name: "Nurse Barbara", shift: "Day Shift (2 PM - 10 PM)", hours: 8, shiftType: "Day" },
+      { name: "Nurse Carol", shift: "Night Shift (10 PM - 6 AM)", hours: 8, shiftType: "Night" },
+      { name: "Nurse Diana", shift: "Morning Shift (6 AM - 2 PM)", hours: 7.5, shiftType: "Morning" },
+      { name: "Nurse Emma", shift: "Day Shift (2 PM - 10 PM)", hours: 8, shiftType: "Day" },
+      { name: "Nurse Fiona", shift: "Night Shift (10 PM - 6 AM)", hours: 8, shiftType: "Night" },
+      { name: "Nurse Grace", shift: "Morning Shift (6 AM - 2 PM)", hours: 6, shiftType: "Morning" },
+      { name: "Nurse Helen", shift: "Day Shift (2 PM - 10 PM)", hours: 8.5, shiftType: "Day" }
+    ];
+
+    const sidebar = document.getElementById('nurseSidebar');
+    const nurseTitle = document.getElementById('nurseTitle');
+    const nurseShift = document.getElementById('nurseShift');
+    const calendarGrid = document.getElementById('calendarGrid');
+    const monthTitle = document.getElementById('monthTitle');
+    const searchInput = document.getElementById('nurseSearch');
+
+    let currentMonth = 9; // October (0-indexed)
+    let currentYear = 2025;
+    let selectedNurse = null;
+
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"];
+
+    // Populate nurses list
+    function renderNurses() {
+      sidebar.innerHTML = '';
+      nurses.forEach((nurse, idx) => {
+        const div = document.createElement('div');
+        div.className = 'nurse-item';
+        div.textContent = nurse.name;
+        div.dataset.idx = idx;
+        sidebar.appendChild(div);
+      });
+    }
+
+    // Load nurse data from CSV if available
+    fetch('Data/NurseData.csv')
+      .then(response => response.text())
+      .then(csv => {
+        const nurseData = csv.split('\n').map(line => {
+          const parts = line.split(';');
+          return {
+            name: parts[0] ? parts[0].trim() : '',
+            shift: parts[1] ? parts[1].trim() : '',
+            hours: parts[2] ? parseFloat(parts[2].trim()) : 8,
+            shiftType: parts[3] ? parts[3].trim() : 'Day'
+          };
+        }).filter(n => n.name);
+        
+        if (nurseData.length > 0) {
+          nurses.length = 0;
+          nurses.push(...nurseData);
+        }
+        renderNurses();
+      })
+      .catch(err => {
+        console.log('CSV not found, using sample data');
+        renderNurses();
+      });
+
+    renderNurses();
+
+    // Show first nurse by default
+    if (nurses.length > 0) {
+      selectedNurse = nurses[0];
+      renderCalendar(selectedNurse);
+      const firstItem = sidebar.querySelector('.nurse-item');
+      if (firstItem) firstItem.classList.add('selected');
+    }
+
+    // Search functionality
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase().trim();
+      const filteredNurses = nurses.filter(nurse =>
+        nurse.name.toLowerCase().includes(query) ||
+        nurse.shift.toLowerCase().includes(query)
+      );
+
+      sidebar.innerHTML = '';
+      filteredNurses.forEach((nurse, idx) => {
+        const div = document.createElement('div');
+        div.className = 'nurse-item';
+        div.textContent = nurse.name;
+        div.dataset.idx = nurses.indexOf(nurse);
+        sidebar.appendChild(div);
+      });
+    });
+
+    // Generate calendar
+    function renderCalendar(nurse) {
+      selectedNurse = nurse;
+      nurseTitle.textContent = nurse.name;
+      nurseShift.textContent = nurse.shift;
+      monthTitle.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+      calendarGrid.innerHTML = '';
+
+      // Day headers
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      days.forEach(day => {
+        const header = document.createElement('div');
+        header.className = 'calendar-day-header';
+        header.textContent = day;
+        calendarGrid.appendChild(header);
+      });
+
+      // Get first day of month and days in month
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      // Empty cells before first day
+      for (let i = 0; i < firstDay; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day empty';
+        calendarGrid.appendChild(emptyDay);
+      }
+
+      // Calculate totals
+      let totalHours = 0;
+      let daysWorked = 0;
+
+      // Generate days
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayEl = document.createElement('div');
+        const dayOfWeek = new Date(currentYear, currentMonth, day).getDay();
+        
+        // Assume nurse works 5 days a week (Mon-Fri)
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+          dayEl.className = 'calendar-day has-shift';
+          totalHours += nurse.hours;
+          daysWorked++;
+
+          dayEl.innerHTML = `
+            <div class="day-number">${day}</div>
+            <div class="day-hours">${nurse.hours}h</div>
+            <div class="day-shift-type">${nurse.shiftType}</div>
+          `;
+
+          dayEl.onclick = () => {
+            alert(`Date: ${monthNames[currentMonth]} ${day}, ${currentYear}\nNurse: ${nurse.name}\nShift: ${nurse.shift}\nHours: ${nurse.hours}h`);
+          };
+        } else {
+          dayEl.className = 'calendar-day';
+          dayEl.innerHTML = `
+            <div class="day-number">${day}</div>
+            <div class="day-shift-type">Off</div>
+          `;
+        }
+
+        calendarGrid.appendChild(dayEl);
+      }
+
+      // Update summary cards
+      document.getElementById('totalHours').textContent = `${totalHours}h`;
+      document.getElementById('overtimeHours').textContent = `${Math.floor(totalHours * 0.1)}h`;
+      document.getElementById('breakHours').textContent = `${daysWorked * 1}h`;
+      document.getElementById('daysWorked').textContent = daysWorked;
+    }
+
+    // Month navigation
+    document.getElementById('prevMonth').addEventListener('click', () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      if (selectedNurse) renderCalendar(selectedNurse);
+    });
+
+    document.getElementById('nextMonth').addEventListener('click', () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      if (selectedNurse) renderCalendar(selectedNurse);
+    });
+
+    // Nurse click event
+    sidebar.addEventListener('click', e => {
+      const item = e.target.closest('.nurse-item');
+      if (!item) return;
+      sidebar.querySelectorAll('.nurse-item').forEach(el => el.classList.remove('selected'));
+      item.classList.add('selected');
+      renderCalendar(nurses[item.dataset.idx]);
+    });
+
+    // Tab navigation
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.textContent.trim();
+        if (tabName === 'Doctor') {
+          window.location.href = 'main.html';
+        } else if (tabName === 'Nurse') {
+          window.Location.href = 'Nurse.html';
+        } else if (tabName === 'Analytic') {
+          window.location.href = 'Analytics.html';
+        } else if (tabName === 'Rooms') {
+          window.location.href = 'Rooms.html';
+        } else if (tabName === 'lab technicians') {
+          window.location.href = 'LabTechnicians.html';
+        } else if (tabName === 'Appointments') {
+          window.location.href = 'Appointments.html';
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
